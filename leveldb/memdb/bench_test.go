@@ -40,6 +40,22 @@ func BenchmarkPutRandom(b *testing.B) {
 	}
 }
 
+func BenchmarkPutRandomKV(b *testing.B) {
+	buf := make([][4]byte, b.N)
+	value := make([][]byte, b.N)
+	for i := range buf {
+		tmp := uint32(rand.Int()) % 100000
+		binary.LittleEndian.PutUint32(buf[i][:], tmp)
+		value[i] = make([]byte, tmp)
+	}
+
+	b.ResetTimer()
+	p := New(comparer.DefaultComparer, 0)
+	for i := range buf {
+		p.Put(buf[i][:], value[i][:])
+	}
+}
+
 func BenchmarkGet(b *testing.B) {
 	buf := make([][4]byte, b.N)
 	for i := range buf {
